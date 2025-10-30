@@ -698,22 +698,35 @@
                 });
             }
             
-            // Функция расчета рабочих часов в месяце
+            // Функция расчета рабочих часов в месяце с учетом производственного календаря
             function calculateWorkHoursInMonth(month, year) {
-                const daysInMonth = new Date(year, month + 1, 0).getDate();
-                let workDays = 0;
+                // Производственный календарь на 2025 год (40-часовая рабочая неделя)
+                const workingHours2025 = [136, 160, 167, 175, 144, 151, 184, 168, 176, 184, 151, 176];
                 
-                for (let day = 1; day <= daysInMonth; day++) {
-                    const date = new Date(year, month, day);
-                    const dayOfWeek = date.getDay();
+                // Производственный календарь на 2026 год (40-часовая рабочая неделя)
+                const workingHours2026 = [120, 152, 168, 175, 151, 167, 184, 168, 176, 176, 159, 176];
+                
+                if (year === 2025) {
+                    return workingHours2025[month];
+                } else if (year === 2026) {
+                    return workingHours2026[month];
+                } else {
+                    // Для других лет используем стандартный расчет (исключая выходные)
+                    const daysInMonth = new Date(year, month + 1, 0).getDate();
+                    let workDays = 0;
                     
-                    // 0 - воскресенье, 6 - суббота
-                    if (dayOfWeek !== 0 && dayOfWeek !== 6) {
-                        workDays++;
+                    for (let day = 1; day <= daysInMonth; day++) {
+                        const date = new Date(year, month, day);
+                        const dayOfWeek = date.getDay();
+                        
+                        // 0 - воскресенье, 6 - суббота
+                        if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+                            workDays++;
+                        }
                     }
+                    
+                    return workDays * 8; // 8 часов в день
                 }
-                
-                return workDays * 8; // 8 часов в день
             }
             
             // Инициализация первой кнопки удаления
