@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Калькулятор ГПХ</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+        
+        input:focus, select:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+        }
+        
+        .btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background 0.3s;
+            display: block;
+            width: 100%;
+            margin-top: 20px;
+        }
+        
+        .btn:hover {
+            background-color: #2980b9;
+        }
+        
+        .result-section {
+            margin-top: 30px;
+            display: none;
+        }
+        
+        .result-card {
+            background-color: #f8f9fa;
+            border-left: 4px solid #3498db;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        
+        .result-card h3 {
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        
+        .result-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #27ae60;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        
+        .task-row {
+            display: flex;
+            margin-bottom: 10px;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .task-input {
+            flex: 2;
+        }
+        
+        .hours-input {
+            width: 100px;
+        }
+        
+        .price-input {
+            width: 150px;
+        }
+        
+        .add-task-btn {
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        
+        .add-task-btn:hover {
+            background-color: #27ae60;
+        }
+        
+        .remove-task-btn {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .remove-task-btn:hover {
+            background-color: #c0392b;
+        }
+        
+        .error {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        
+        .tax-info {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        
+        .auto-distribute-btn {
+            background-color: #9b59b6;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+            margin-left: 10px;
+        }
+        
+        .auto-distribute-btn:hover {
+            background-color: #8e44ad;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            table {
+                font-size: 14px;
+            }
+            
+            th, td {
+                padding: 8px 10px;
+            }
+            
+            .task-row {
+                flex-direction: column;
+            }
+            
+            .task-input, .hours-input, .price-input {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Калькулятор ГПХ</h1>
+        
+        <div class="form-group">
+            <label for="offerAmount">Сумма оффера (руб.):</label>
+            <input type="number" id="offerAmount" placeholder="Введите сумму оффера">
+            <div class="error" id="offerAmountError"></div>
+        </div>
+        
+        <div class="form-group">
+            <label for="workedHours">Количество отработанных часов:</label>
+            <input type="number" id="workedHours" placeholder="Введите количество часов" step="1" min="1">
+            <div class="error" id="workedHoursError"></div>
+        </div>
+        
+        <div class="form-group">
+            <label for="monthSelect">Текущий месяц:</label>
+            <select id="monthSelect">
+                <option value="">Выберите месяц</option>
+                <option value="0">Январь</option>
+                <option value="1">Февраль</option>
+                <option value="2">Март</option>
+                <option value="3">Апрель</option>
+                <option value="4">Май</option>
+                <option value="5">Июнь</option>
+                <option value="6">Июль</option>
+                <option value="7">Август</option>
+                <option value="8">Сентябрь</option>
+                <option value="9">Октябрь</option>
+                <option value="10">Ноябрь</option>
+                <option value="11">Декабрь</option>
+            </select>
+            <div class="error" id="monthError"></div>
+        </div>
+        
+        <div class="form-group">
+            <label for="yearSelect">Год:</label>
+            <select id="yearSelect">
+                <option value="2024">2024</option>
+                <option value="2025" selected>2025</option>
+                <option value="2026">2026</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label>Распределение задач:</label>
+            <div id="tasksContainer">
+                <div class="task-row">
+                    <input type="text" class="task-input" placeholder="Описание задачи">
+                    <input type="number" class="hours-input" placeholder="Часы" step="1" min="1">
+                    <input type="number" class="price-input" placeholder="Стоимость часа" step="1" min="1">
+                    <button class="remove-task-btn">Удалить</button>
+                </div>
+            </div>
+            <div>
+                <button class="add-task-btn" id="addTaskBtn">+ Добавить задачу</button>
+                <button class="auto-distribute-btn" id="autoDistributeBtn">Автораспределение</button>
+            </div>
+            <div class="error" id="tasksError"></div>
+        </div>
+        
+        <button class="btn" id="calculateBtn">Рассчитать</button>
+        
+        <div class="result-section" id="resultSection">
+            <div class="result-card">
+                <h3>Цена часа в текущем месяце:</h3>
+                <div class="result-value" id="hourPriceResult"></div>
+                <p>(Сумма оффера / Количество рабочих часов в месяце)</p>
+            </div>
+            
+            <div class="result-card">
+                <h3>Общая стоимость услуг (без НДФЛ):</h3>
+                <div class="result-value" id="totalCostResult"></div>
+                <p>(Цена часа × Отработанные часы)</p>
+            </div>
+            
+            <div class="result-card">
+                <h3>Сумма НДФЛ (13%):</h3>
+                <div class="result-value" id="ndflResult"></div>
+            </div>
+            
+            <div class="result-card">
+                <h3>Итого к выплате (с НДФЛ):</h3>
+                <div class="result-value" id="finalAmountResult"></div>
+                <p>(Общая стоимость / (100% - 13%))</p>
+            </div>
+            
+            <div class="tax-info">
+                <h3>Налоговая информация:</h3>
+                <p>При работе по договору ГПХ с физическим лицом заказчик обязан удержать и перечислить в бюджет НДФЛ по ставке 13%. В данном расчете НДФЛ добавляется к стоимости услуг.</p>
+            </div>
+            
+            <h3>Распределение задач:</h3>
+            <table id="tasksTable">
+                <thead>
+                    <tr>
+                        <th>№</th>
+                        <th>Оказываемые Услуги</th>
+                        <th>Кол-во часов</th>
+                        <th>Стоимость услуги за 1 час, рублей</th>
+                        <th>Общая стоимость, рублей</th>
+                    </tr>
+                </thead>
+                <tbody id="tasksTableBody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const offerAmountInput = document.getElementById('offerAmount');
+            const workedHoursInput = document.getElementById('workedHours');
+            const monthSelect = document.getElementById('monthSelect');
+            const yearSelect = document.getElementById('yearSelect');
+            const tasksContainer = document.getElementById('tasksContainer');
+            const addTaskBtn = document.getElementById('addTaskBtn');
+            const autoDistributeBtn = document.getElementById('autoDistributeBtn');
+            const calculateBtn = document.getElementById('calculateBtn');
+            const resultSection = document.getElementById('resultSection');
+            const hourPriceResult = document.getElementById('hourPriceResult');
+            const totalCostResult = document.getElementById('totalCostResult');
+            const ndflResult = document.getElementById('ndflResult');
+            const finalAmountResult = document.getElementById('finalAmountResult');
+            const tasksTableBody = document.getElementById('tasksTableBody');
+            
+            // Добавление новой задачи
+            addTaskBtn.addEventListener('click', function() {
+                const taskRow = document.createElement('div');
+                taskRow.className = 'task-row';
+                taskRow.innerHTML = `
+                    <input type="text" class="task-input" placeholder="Описание задачи">
+                    <input type="number" class="hours-input" placeholder="Часы" step="1" min="1">
+                    <input type="number" class="price-input" placeholder="Стоимость часа" step="1" min="1">
+                    <button class="remove-task-btn">Удалить</button>
+                `;
+                tasksContainer.appendChild(taskRow);
+                
+                // Добавляем обработчик для кнопки удаления
+                const removeBtn = taskRow.querySelector('.remove-task-btn');
+                removeBtn.addEventListener('click', function() {
+                    tasksContainer.removeChild(taskRow);
+                });
+            });
+            
+            // Автораспределение часов и стоимости
+            autoDistributeBtn.addEventListener('click', function() {
+                const workedHours = parseInt(workedHoursInput.value) || 0;
+                const offerAmount = parseFloat(offerAmountInput.value) || 0;
+                
+                if (workedHours <= 0 || offerAmount <= 0) {
+                    alert('Сначала введите сумму оффера и количество часов');
+                    return;
+                }
+                
+                const taskRows = tasksContainer.querySelectorAll('.task-row');
+                const taskCount = taskRows.length;
+                
+                if (taskCount === 0) {
+                    alert('Добавьте хотя бы одну задачу');
+                    return;
+                }
+                
+                // Базовая цена часа
+                const month = parseInt(monthSelect.value);
+                const year = parseInt(yearSelect.value);
+                const workHoursInMonth = calculateWorkHoursInMonth(month, year);
+                const baseHourPrice = offerAmount / workHoursInMonth;
+                
+                // Распределяем часы (целые числа, разные)
+                const hours = distributeHours(workedHours, taskCount);
+                
+                // Распределяем стоимость часа (целые числа, разные)
+                const prices = distributePrices(Math.round(baseHourPrice), taskCount);
+                
+                // Заполняем поля
+                taskRows.forEach((row, index) => {
+                    const hoursInput = row.querySelector('.hours-input');
+                    const priceInput = row.querySelector('.price-input');
+                    
+                    hoursInput.value = hours[index];
+                    priceInput.value = prices[index];
+                });
+            });
+            
+            // Обработчик для кнопки расчета
+            calculateBtn.addEventListener('click', function() {
+                // Сброс ошибок
+                resetErrors();
+                
+                // Валидация данных
+                let isValid = true;
+                
+                if (!offerAmountInput.value || parseFloat(offerAmountInput.value) <= 0) {
+                    document.getElementById('offerAmountError').textContent = 'Введите корректную сумму оффера';
+                    isValid = false;
+                }
+                
+                if (!workedHoursInput.value || parseFloat(workedHoursInput.value) <= 0) {
+                    document.getElementById('workedHoursError').textContent = 'Введите корректное количество часов';
+                    isValid = false;
+                }
+                
+                if (!monthSelect.value) {
+                    document.getElementById('monthError').textContent = 'Выберите месяц';
+                    isValid = false;
+                }
+                
+                // Проверка распределения часов по задачам
+                const taskRows = tasksContainer.querySelectorAll('.task-row');
+                let totalTaskHours = 0;
+                let hasTasks = false;
+                
+                taskRows.forEach(row => {
+                    const hoursInput = row.querySelector('.hours-input');
+                    const priceInput = row.querySelector('.price-input');
+                    const taskInput = row.querySelector('.task-input');
+                    
+                    if (hoursInput.value && parseFloat(hoursInput.value) > 0) {
+                        totalTaskHours += parseInt(hoursInput.value);
+                    }
+                    
+                    if (hoursInput.value && parseFloat(hoursInput.value) > 0 && !taskInput.value) {
+                        document.getElementById('tasksError').textContent = 'Для всех задач с указанными часами должно быть описание';
+                        isValid = false;
+                    }
+                    
+                    if (hoursInput.value && parseFloat(hoursInput.value) > 0 && (!priceInput.value || parseFloat(priceInput.value) <= 0)) {
+                        document.getElementById('tasksError').textContent = 'Для всех задач с указанными часами должна быть указана стоимость часа';
+                        isValid = false;
+                    }
+                    
+                    if (taskInput.value.trim() !== '') {
+                        hasTasks = true;
+                    }
+                });
+                
+                if (!hasTasks) {
+                    document.getElementById('tasksError').textContent = 'Добавьте хотя бы одну задачу';
+                    isValid = false;
+                }
+                
+                if (totalTaskHours !== parseInt(workedHoursInput.value)) {
+                    document.getElementById('tasksError').textContent = `Сумма часов по задачам (${totalTaskHours}) не равна общему количеству отработанных часов (${workedHoursInput.value})`;
+                    isValid = false;
+                }
+                
+                if (!isValid) return;
+                
+                // Расчеты
+                const offerAmount = parseFloat(offerAmountInput.value);
+                const workedHours = parseInt(workedHoursInput.value);
+                const month = parseInt(monthSelect.value);
+                const year = parseInt(yearSelect.value);
+                
+                // Расчет рабочих часов в месяце
+                const workHoursInMonth = calculateWorkHoursInMonth(month, year);
+                
+                // Расчет цены часа
+                const hourPrice = offerAmount / workHoursInMonth;
+                
+                // Расчет общей стоимости услуг (без НДФЛ)
+                const totalCost = hourPrice * workedHours;
+                
+                // Расчет итоговой суммы к выплате (с НДФЛ) по правильной формуле
+                const finalAmount = totalCost / (1 - 0.13);
+                
+                // Расчет НДФЛ
+                const ndfl = finalAmount - totalCost;
+                
+                // Отображение результатов
+                hourPriceResult.textContent = `${formatMoney(hourPrice)} руб.`;
+                totalCostResult.textContent = `${formatMoney(totalCost)} руб.`;
+                ndflResult.textContent = `${formatMoney(ndfl)} руб.`;
+                finalAmountResult.textContent = `${formatMoney(finalAmount)} руб.`;
+                
+                // Заполнение таблицы задач
+                tasksTableBody.innerHTML = '';
+                let taskNumber = 1;
+                let totalCalculatedCost = 0;
+                
+                taskRows.forEach(row => {
+                    const taskInput = row.querySelector('.task-input');
+                    const hoursInput = row.querySelector('.hours-input');
+                    const priceInput = row.querySelector('.price-input');
+                    
+                    if (taskInput.value && hoursInput.value && parseFloat(hoursInput.value) > 0 && 
+                        priceInput.value && parseFloat(priceInput.value) > 0) {
+                        const taskHours = parseInt(hoursInput.value);
+                        const taskHourPrice = parseInt(priceInput.value);
+                        const taskCost = taskHourPrice * taskHours;
+                        totalCalculatedCost += taskCost;
+                        
+                        const tableRow = document.createElement('tr');
+                        tableRow.innerHTML = `
+                            <td>${taskNumber}</td>
+                            <td>${taskInput.value}</td>
+                            <td>${taskHours}</td>
+                            <td>${formatMoney(taskHourPrice)}</td>
+                            <td>${formatMoney(taskCost)}</td>
+                        `;
+                        tasksTableBody.appendChild(tableRow);
+                        taskNumber++;
+                    }
+                });
+                
+                // Корректировка общей суммы под итоговую сумму с НДФЛ
+                // Вычисляем коэффициент для корректировки
+                const adjustmentFactor = finalAmount / totalCalculatedCost;
+                
+                // Пересчитываем таблицу с учетом корректировки
+                tasksTableBody.innerHTML = '';
+                taskNumber = 1;
+                totalCalculatedCost = 0;
+                
+                taskRows.forEach(row => {
+                    const taskInput = row.querySelector('.task-input');
+                    const hoursInput = row.querySelector('.hours-input');
+                    const priceInput = row.querySelector('.price-input');
+                    
+                    if (taskInput.value && hoursInput.value && parseFloat(hoursInput.value) > 0 && 
+                        priceInput.value && parseFloat(priceInput.value) > 0) {
+                        const taskHours = parseInt(hoursInput.value);
+                        // Округляем стоимость часа до целого в большую или меньшую сторону
+                        const taskHourPrice = Math.round(parseFloat(priceInput.value) * adjustmentFactor);
+                        const taskCost = taskHourPrice * taskHours;
+                        totalCalculatedCost += taskCost;
+                        
+                        const tableRow = document.createElement('tr');
+                        tableRow.innerHTML = `
+                            <td>${taskNumber}</td>
+                            <td>${taskInput.value}</td>
+                            <td>${taskHours}</td>
+                            <td>${formatMoney(taskHourPrice)}</td>
+                            <td>${formatMoney(taskCost)}</td>
+                        `;
+                        tasksTableBody.appendChild(tableRow);
+                        taskNumber++;
+                    }
+                });
+                
+                // Добавляем итоговую строку
+                const totalRow = document.createElement('tr');
+                totalRow.style.fontWeight = 'bold';
+                totalRow.innerHTML = `
+                    <td colspan="2">ИТОГО:</td>
+                    <td>${workedHours}</td>
+                    <td></td>
+                    <td>${formatMoney(totalCalculatedCost)}</td>
+                `;
+                tasksTableBody.appendChild(totalRow);
+                
+                // Показываем секцию с результатами
+                resultSection.style.display = 'block';
+            });
+            
+            // Функция распределения часов (целые числа, разные)
+            function distributeHours(totalHours, taskCount) {
+                // Создаем массив для часов
+                let hours = [];
+                
+                // Вычисляем среднее количество часов на задачу
+                const avgHours = totalHours / taskCount;
+                
+                // Создаем базовое распределение с разными значениями
+                for (let i = 0; i < taskCount; i++) {
+                    // Базовое значение - среднее с небольшими вариациями
+                    let baseValue = Math.round(avgHours);
+                    
+                    // Добавляем вариацию в зависимости от позиции
+                    let variation = Math.round((i - taskCount/2) * 0.7);
+                    
+                    // Вычисляем значение часа для этой задачи
+                    let hourValue = baseValue + variation;
+                    
+                    // Убедимся, что значение не меньше 1
+                    hourValue = Math.max(1, hourValue);
+                    
+                    hours.push(hourValue);
+                }
+                
+                // Вычисляем текущую сумму
+                let currentSum = hours.reduce((a, b) => a + b, 0);
+                let difference = totalHours - currentSum;
+                
+                // Корректируем сумму, добавляя/убавляя часы где нужно
+                let index = 0;
+                while (difference !== 0) {
+                    if (difference > 0) {
+                        // Добавляем часы
+                        hours[index % taskCount]++;
+                        difference--;
+                    } else {
+                        // Убавляем часы (но не меньше 1)
+                        if (hours[index % taskCount] > 1) {
+                            hours[index % taskCount]--;
+                            difference++;
+                        }
+                    }
+                    index++;
+                    
+                    // Защита от бесконечного цикла
+                    if (index > taskCount * 10) break;
+                }
+                
+                // Перемешиваем массив, чтобы часы не были в порядке возрастания/убывания
+                for (let i = hours.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [hours[i], hours[j]] = [hours[j], hours[i]];
+                }
+                
+                return hours;
+            }
+            
+            // Функция распределения стоимости часа (целые числа, разные)
+            function distributePrices(basePrice, taskCount) {
+                const prices = [];
+                const variation = 0.2; // 20% вариация
+                
+                for (let i = 0; i < taskCount; i++) {
+                    // Создаем разную стоимость для каждой задачи
+                    const variationFactor = 1 - variation + (Math.random() * variation * 2);
+                    let price = Math.round(basePrice * variationFactor);
+                    
+                    // Округляем до целого
+                    if (price < 1) price = 1;
+                    
+                    prices.push(price);
+                }
+                
+                // Убедимся, что цены разные
+                if (taskCount > 1) {
+                    const uniquePrices = new Set(prices);
+                    if (uniquePrices.size < taskCount) {
+                        // Если есть одинаковые цены, немного изменим распределение
+                        for (let i = 0; i < taskCount - 1; i++) {
+                            if (prices[i] === prices[i + 1]) {
+                                prices[i] += Math.round(basePrice * 0.05);
+                                prices[i + 1] -= Math.round(basePrice * 0.05);
+                                
+                                // Если цена стала отрицательной, установим минимальную
+                                if (prices[i + 1] < 1) {
+                                    prices[i + 1] = 1;
+                                }
+                                break;
+                            }
+                        }
+                    }
+                }
+                
+                return prices;
+            }
+            
+            // Функция форматирования денежных значений
+            function formatMoney(amount) {
+                // Округляем до целого числа
+                const rounded = Math.round(amount);
+                
+                // Форматируем с разделителями тысяч
+                return rounded.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+            }
+            
+            // Функция сброса ошибок
+            function resetErrors() {
+                const errorElements = document.querySelectorAll('.error');
+                errorElements.forEach(el => {
+                    el.textContent = '';
+                });
+            }
+            
+            // Функция расчета рабочих часов в месяце
+            function calculateWorkHoursInMonth(month, year) {
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+                let workDays = 0;
+                
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const date = new Date(year, month, day);
+                    const dayOfWeek = date.getDay();
+                    
+                    // 0 - воскресенье, 6 - суббота
+                    if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+                        workDays++;
+                    }
+                }
+                
+                return workDays * 8; // 8 часов в день
+            }
+            
+            // Инициализация первой кнопки удаления
+            const firstRemoveBtn = tasksContainer.querySelector('.remove-task-btn');
+            firstRemoveBtn.addEventListener('click', function() {
+                const taskRow = this.parentElement;
+                // Не удаляем последнюю задачу
+                if (tasksContainer.children.length > 1) {
+                    tasksContainer.removeChild(taskRow);
+                }
+            });
+            
+            // Автоматическое заполнение месяца текущим
+            const now = new Date();
+            monthSelect.value = now.getMonth().toString();
+        });
+    </script>
+</body>
+</html>
