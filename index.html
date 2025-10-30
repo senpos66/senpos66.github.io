@@ -180,14 +180,6 @@
             margin-top: 5px;
         }
         
-        .tax-info {
-            background-color: #fff3cd;
-            border: 1px solid #ffeaa7;
-            border-radius: 5px;
-            padding: 15px;
-            margin-top: 20px;
-        }
-        
         .auto-distribute-btn {
             background-color: #9b59b6;
             color: white;
@@ -266,7 +258,6 @@
         <div class="form-group">
             <label for="yearSelect">Год:</label>
             <select id="yearSelect">
-                <option value="2024">2024</option>
                 <option value="2025" selected>2025</option>
                 <option value="2026">2026</option>
             </select>
@@ -313,11 +304,6 @@
                 <h3>Итого к выплате (с НДФЛ):</h3>
                 <div class="result-value" id="finalAmountResult"></div>
                 <p>(Общая стоимость / (100% - 13%))</p>
-            </div>
-            
-            <div class="tax-info">
-                <h3>Налоговая информация:</h3>
-                <p>При работе по договору ГПХ с физическим лицом заказчик обязан удержать и перечислить в бюджет НДФЛ по ставке 13%. В данном расчете НДФЛ добавляется к стоимости услуг.</p>
             </div>
             
             <h3>Распределение задач:</h3>
@@ -746,3 +732,4 @@
     </script>
 </body>
 </html>
+
