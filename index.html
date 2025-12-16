@@ -283,28 +283,95 @@
         <button class="btn" id="calculateBtn">Рассчитать</button>
         
         <div class="result-section" id="resultSection">
-            <div class="result-card">
-                <h3>Цена часа в текущем месяце:</h3>
-                <div class="result-value" id="hourPriceResult"></div>
-                <p>(Сумма оффера / Количество рабочих часов в месяце)</p>
-            </div>
-            
-            <div class="result-card">
-                <h3>Общая стоимость услуг (без НДФЛ):</h3>
-                <div class="result-value" id="totalCostResult"></div>
-                <p>(Цена часа × Отработанные часы)</p>
-            </div>
-            
-            <div class="result-card">
-                <h3>Сумма НДФЛ (13%):</h3>
-                <div class="result-value" id="ndflResult"></div>
-            </div>
-            
-            <div class="result-card">
-                <h3>Итого к выплате (с НДФЛ):</h3>
-                <div class="result-value" id="finalAmountResult"></div>
-                <p>(Общая стоимость / (100% - 13%))</p>
-            </div>
+<div class="results-grid">
+<div class="result-card main">
+<h3>Сумма на руки</h3>
+<div class="result-value" id="totalCostResult"></div>
+<p class="hint">Фактически получаемая сумма после удержания НДФЛ</p>
+</div>
+
+
+<div class="result-card">
+<h3>Начислено (грязными)</h3>
+<div class="result-value blue" id="finalAmountResult"></div>
+<p class="hint">Сумма по договору ГПХ</p>
+</div>
+
+
+<div class="result-card">
+<h3>НДФЛ 13%</h3>
+<div class="result-value red" id="ndflResult"></div>
+</div>
+
+
+<div class="result-card">
+<h3>Цена часа</h3>
+<div class="result-value" id="hourPriceResult"></div>
+<p class="hint">Оффер / рабочие часы месяца</p>
+</div>
+</div>
+
+
+<h3 style="margin-top:30px">Распределение задач</h3>
+<table id="tasksTable">
+<thead>
+<tr>
+<th>№</th>
+<th>Услуги</th>
+<th>Часы</th>
+<th>Цена часа</th>
+<th>Сумма</th>
+</tr>
+</thead>
+<tbody id="tasksTableBody"></tbody>
+</table>
+</div>
+
+
+<style>
+.results-grid {
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+gap: 20px;
+}
+
+
+.result-card {
+background: #f8fafc;
+border-radius: 12px;
+padding: 20px;
+box-shadow: 0 4px 12px rgba(0,0,0,.05);
+}
+
+
+.result-card.main {
+background: linear-gradient(135deg, #2ecc71, #27ae60);
+color: #fff;
+}
+
+
+.result-card.main .result-value {
+color: #fff;
+}
+
+
+.result-value {
+font-size: 28px;
+font-weight: 700;
+margin-top: 10px;
+}
+
+
+.result-value.blue { color: #3498db; }
+.result-value.red { color: #e74c3c; }
+
+
+.hint {
+font-size: 13px;
+opacity: .8;
+margin-top: 6px;
+}
+</style>
             
             <h3>Распределение задач:</h3>
             <table id="tasksTable">
@@ -732,5 +799,6 @@
     </script>
 </body>
 </html>
+
 
 
